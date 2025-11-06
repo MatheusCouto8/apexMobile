@@ -5,36 +5,45 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: '#007AFF',
-        tabBarInactiveTintColor: '#8E8E93',
+        tabBarActiveTintColor: '#3EBDD9',
+        tabBarInactiveTintColor: '#6B7280',
         headerStyle: {
           backgroundColor: '#F8F9FA',
         },
         headerTintColor: '#000',
         tabBarStyle: {
-          backgroundColor: '#F8F9FA',
-          borderTopWidth: 1,
-          borderTopColor: '#E5E5EA',
+          position: 'absolute',
+          backgroundColor: '#171C20',
+          borderTopWidth: 0,
+          borderTopColor: 'transparent',
+          borderWidth: 0,
+          elevation: 0,
+          shadowOpacity: 0,
+          shadowColor: 'transparent',
+          shadowOffset: { width: 0, height: 0 },
+          shadowRadius: 0,
+          height: 65,
+          paddingBottom: 10,
+          paddingTop: 10,
+          left: 0,
+          right: 0,
+          bottom: 0,
         },
+        tabBarShowLabel: false,
       }}
     >
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Apex',
-          headerShown: false,
-          tabBarStyle: { display: 'none' },
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="home" size={size} color={color} />
-          ),
+          href: null,
         }}
       />
       <Tabs.Screen
-        name="profile"
+        name="home"
         options={{
-          title: 'Profile',
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="person" size={size} color={color} />
+          headerShown: false,
+          tabBarIcon: ({ color, size, focused }) => (
+            <Ionicons name={focused ? "home" : "home-outline"} size={28} color={color} />
           ),
         }}
       />
@@ -42,18 +51,21 @@ export default function TabLayout() {
         name="settings"
         options={{
           title: 'Settings',
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="settings" size={size} color={color} />
+          tabBarIcon: ({ color, size, focused }) => (
+            <Ionicons name={focused ? "send" : "send-outline"} size={28} color={color} />
           ),
+        }}
+      />
+      <Tabs.Screen
+        name="profile"
+        options={{
+          href: null,
         }}
       />
       <Tabs.Screen
         name="about"
         options={{
-          title: 'About',
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="information-circle" size={size} color={color} />
-          ),
+          href: null,
         }}
       />
     </Tabs>

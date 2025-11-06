@@ -1,13 +1,18 @@
-import { View, Text, StyleSheet, Image } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { router } from 'expo-router';
 
-export default function HomeScreen() {
+export default function IndexScreen() {
+  const handlePress = () => {
+    router.push('/home');
+  };
+
   return (
-    <View style={styles.container}>
+    <TouchableOpacity style={styles.container} onPress={handlePress}>
         <Image
           source={require('../logo-apex.jpg')}
           style={styles.image}
         />
-    </View>
+    </TouchableOpacity>
   );
 }
 
