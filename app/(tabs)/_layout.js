@@ -22,6 +22,8 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'Apex',
+          headerShown: false,
+          tabBarStyle: { display: 'none' },
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="home" size={size} color={color} />
           ),

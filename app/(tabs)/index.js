@@ -1,10 +1,12 @@
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Image } from 'react-native';
 
 export default function HomeScreen() {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Home</Text>
-      <Text style={styles.subtitle}>Bem-vindo à tela inicial</Text>
+        <Image
+          source={require('../logo-apex.jpg')}
+          style={styles.image}
+        />
     </View>
   );
 }
@@ -26,4 +28,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#666666',
   },
+  image: {
+    width: 400,
+    height: 400,
+    marginBottom: 20,
+    borderRadius: 100,
+  }
 });
