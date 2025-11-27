@@ -27,7 +27,14 @@ export default function DetailsScreen() {
 
   const fetchWeatherDetails = async () => {
     try {
-      const coords = cityCoordinates[params.cityName];
+      // Tentar usar coordenadas dos parâmetros primeiro, senão usar do dicionário
+      let coords;
+      if (params.lat && params.lon) {
+        coords = { lat: parseFloat(params.lat), lon: parseFloat(params.lon) };
+      } else {
+        coords = cityCoordinates[params.cityName];
+      }
+      
       if (!coords) return;
 
       const response = await fetch(

@@ -1,8 +1,10 @@
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, StatusBar, Image, FlatList, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useState, useEffect } from 'react';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect } from '@react-navigation/native';
 
 // Componente para card com gradiente
 const SolidCard = ({ children, style }) => (
@@ -24,14 +26,26 @@ export default function HomeScreen() {
   const [weatherData, setWeatherData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [todayWeather, setTodayWeather] = useState(null);
+  const [cities, setCities] = useState([]);
 
-  // Coordenadas das cidades
-  const cities = [
-    { name: 'Valinhos', lat: -22.97, lon: -46.99 },
-    { name: 'Campinas', lat: -22.91, lon: -47.06 },
-    { name: 'São Paulo', lat: -23.55, lon: -46.63 },
-    { name: 'Brasília', lat: -15.79, lon: -47.89 }
-  ];
+  // Carregar cidades do AsyncStorage quando a tela ganha foco
+  useFocusEffect(
+    React.useCallback(() => {
+      loadCities();
+    }, [])
+  );
+
+  const loadCities = async () => {
+    try {
+      const savedCities = await AsyncStorage.getItem('cities');
+      if (savedCities) {
+        const parsedCities = JSON.parse(savedCities);
+        setCities(parsedCities);
+      }
+    } catch (error) {
+      console.error('Erro ao carregar cidades:', error);
+    }
+  };
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -42,8 +56,10 @@ export default function HomeScreen() {
   }, []);
 
   useEffect(() => {
-    fetchWeatherData();
-  }, []);
+    if (cities.length > 0) {
+      fetchWeatherData();
+    }
+  }, [cities]);
 
   const fetchWeatherData = async () => {
     try {
@@ -66,7 +82,9 @@ export default function HomeScreen() {
           name: city.name,
           temperature: Math.round(data.current_weather.temperature),
           weatherCode: data.current_weather.weathercode,
-          windSpeed: data.current_weather.windspeed
+          windSpeed: data.current_weather.windspeed,
+          lat: city.lat,
+          lon: city.lon
         };
       });
 
@@ -166,7 +184,9 @@ export default function HomeScreen() {
                     params: {
                       cityName: item.name,
                       temperature: item.temperature,
-                      weatherCode: item.weatherCode
+                      weatherCode: item.weatherCode,
+                      lat: item.lat,
+                      lon: item.lon
                     }
                   })}
                   activeOpacity={0.8}

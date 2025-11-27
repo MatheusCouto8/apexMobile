@@ -1,10 +1,231 @@
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, TextInput, Modal, Alert, Animated } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { useState, useEffect, useRef } from 'react';
+import { LinearGradient } from 'expo-linear-gradient';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function SettingsScreen() {
+  const [cities, setCities] = useState([]);
+
+  // Carregar cidades do AsyncStorage
+  useEffect(() => {
+    loadCities();
+  }, []);
+
+  const loadCities = async () => {
+    try {
+      const savedCities = await AsyncStorage.getItem('cities');
+      if (savedCities) {
+        setCities(JSON.parse(savedCities));
+      } else {
+        // Cidades padrão
+        const defaultCities = [
+          { id: 1, name: 'Valinhos', lat: -22.97, lon: -46.99 },
+          { id: 2, name: 'Campinas', lat: -22.91, lon: -47.06 },
+          { id: 3, name: 'São Paulo', lat: -23.55, lon: -46.63 },
+          { id: 4, name: 'Brasília', lat: -15.79, lon: -47.89 }
+        ];
+        setCities(defaultCities);
+        await AsyncStorage.setItem('cities', JSON.stringify(defaultCities));
+      }
+    } catch (error) {
+      console.error('Erro ao carregar cidades:', error);
+    }
+  };
+
+  const [modalVisible, setModalVisible] = useState(false);
+  const [newCityName, setNewCityName] = useState('');
+  const [loading, setLoading] = useState(false);
+  const scaleAnim = useRef(new Animated.Value(0)).current;
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const listFadeAnim = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    if (modalVisible) {
+      Animated.parallel([
+        Animated.spring(scaleAnim, {
+          toValue: 1,
+          friction: 8,
+          tension: 40,
+          useNativeDriver: true,
+        }),
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    } else {
+      scaleAnim.setValue(0);
+      fadeAnim.setValue(0);
+    }
+  }, [modalVisible]);
+
+  const handleAddCity = async () => {
+    if (!newCityName) {
+      Alert.alert('Erro', 'Digite o nome da cidade');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      // Buscar coordenadas usando a API de geocoding do Open-Meteo
+      const geocodeResponse = await fetch(
+        `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(newCityName)}&count=1&language=pt&format=json`
+      );
+      const geocodeData = await geocodeResponse.json();
+
+      if (!geocodeData.results || geocodeData.results.length === 0) {
+        Alert.alert('Erro', 'Cidade não encontrada. Tente outro nome.');
+        setLoading(false);
+        return;
+      }
+
+      const cityData = geocodeData.results[0];
+
+      const newCity = {
+        id: Date.now(),
+        name: cityData.name,
+        lat: cityData.latitude,
+        lon: cityData.longitude
+      };
+
+      const updatedCities = [...cities, newCity];
+      setCities(updatedCities);
+      await AsyncStorage.setItem('cities', JSON.stringify(updatedCities));
+      setModalVisible(false);
+      setNewCityName('');
+      setLoading(false);
+      Alert.alert('Sucesso', `${cityData.name} adicionada com sucesso!`);
+    } catch (error) {
+      console.error('Erro ao buscar coordenadas:', error);
+      Alert.alert('Erro', 'Não foi possível adicionar a cidade. Tente novamente.');
+      setLoading(false);
+    }
+  };
+
+  const handleRemoveCity = async (cityId) => {
+    try {
+      const updatedCities = cities.filter(city => city.id !== cityId);
+      setCities(updatedCities);
+      await AsyncStorage.setItem('cities', JSON.stringify(updatedCities));
+    } catch (error) {
+      console.error('Erro ao remover cidade:', error);
+    }
+  };
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Settings</Text>
-      <Text style={styles.subtitle}>Configurações do aplicativo</Text>
+      {/* Header com logo */}
+      <View style={styles.header}>
+        <Image source={require('../logo-apex.jpg')} style={styles.logo} />
+      </View>
+
+      {/* Título e Botão */}
+      <View style={styles.topSection}>
+        <View style={styles.titleSection}>
+          <Text style={styles.title}>Cidades</Text>
+          <Text style={styles.subtitle}>{cities.length} cidade{cities.length !== 1 ? 's' : ''} salva{cities.length !== 1 ? 's' : ''}</Text>
+        </View>
+
+        <TouchableOpacity 
+          onPress={() => setModalVisible(true)}
+          activeOpacity={0.9}
+        >
+          <LinearGradient
+            colors={["#60D7E9", "#2A91D4"]}
+            style={styles.addButton}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+          >
+            <Ionicons name="add" size={24} color="#FFFFFF" />
+            <Text style={styles.addButtonText}>Nova Cidade</Text>
+          </LinearGradient>
+        </TouchableOpacity>
+      </View>
+
+      <ScrollView style={styles.content} showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
+        {/* Lista de Cidades */}
+        <View style={styles.citiesSection}>
+          {cities.map((city) => (
+            <View key={city.id} style={styles.cityCard}>
+              <View style={styles.cityCardLeft}>
+                <Ionicons name="location-outline" size={24} color="#60D7E9" />
+                <View style={styles.cityDetails}>
+                  <Text style={styles.cityName}>{city.name}</Text>
+                  <Text style={styles.cityCoords}>
+                    {city.lat.toFixed(2)}°, {city.lon.toFixed(2)}°
+                  </Text>
+                </View>
+              </View>
+              <TouchableOpacity 
+                onPress={() => handleRemoveCity(city.id)}
+                style={styles.deleteButton}
+              >
+                <Ionicons name="close-circle" size={24} color="#FF6B6B" />
+              </TouchableOpacity>
+            </View>
+          ))}
+        </View>
+      </ScrollView>
+
+      {/* Modal para adicionar cidade */}
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <Animated.View style={[styles.modalOverlay, { opacity: fadeAnim }]}>
+          <Animated.View style={[
+            styles.modalContent,
+            {
+              transform: [{ scale: scaleAnim }],
+              opacity: fadeAnim
+            }
+          ]}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Nova Cidade</Text>
+              <TouchableOpacity 
+                onPress={() => setModalVisible(false)}
+                style={styles.closeButton}
+              >
+                <Ionicons name="close" size={28} color="#666" />
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.modalBody}>
+              <TextInput
+                style={styles.input}
+                placeholder="Digite o nome da cidade"
+                placeholderTextColor="#AAAAAA"
+                value={newCityName}
+                onChangeText={setNewCityName}
+                autoFocus={true}
+              />
+
+              <TouchableOpacity 
+                style={[styles.saveButton, loading && styles.saveButtonDisabled]} 
+                onPress={handleAddCity}
+                disabled={loading}
+                activeOpacity={0.8}
+              >
+                <LinearGradient
+                  colors={loading ? ["#B0B0B0", "#808080"] : ["#60D7E9", "#2A91D4"]}
+                  style={styles.saveButtonGradient}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                >
+                  <Text style={styles.saveButtonText}>
+                    {loading ? 'Buscando...' : 'Adicionar'}
+                  </Text>
+                </LinearGradient>
+              </TouchableOpacity>
+            </View>
+          </Animated.View>
+        </Animated.View>
+      </Modal>
     </View>
   );
 }
@@ -12,18 +233,157 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
+    backgroundColor: '#171C20',
+  },
+  header: {
+    paddingTop: 50,
+    paddingBottom: 20,
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
+  },
+  logo: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+  },
+  content: {
+    flex: 1,
+    paddingHorizontal: 20,
+  },
+  scrollContent: {
+    paddingBottom: 20,
+  },
+  topSection: {
+    paddingHorizontal: 20,
+    paddingVertical: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: '#2A3135',
+  },
+  titleSection: {
+    flex: 1,
   },
   title: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
-    marginBottom: 10,
-    color: '#000000',
+    color: '#FFFFFF',
+    marginBottom: 4,
   },
   subtitle: {
+    fontSize: 13,
+    color: '#999',
+  },
+  addButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 12,
+    gap: 8,
+    shadowColor: '#60D7E9',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  addButtonText: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#FFFFFF',
+  },
+  citiesSection: {
+    gap: 12,
+    paddingTop: 20,
+  },
+  cityCard: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: '#1E2528',
+    borderRadius: 12,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: '#2A3135',
+  },
+  cityCardLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+    gap: 12,
+  },
+  cityDetails: {
+    flex: 1,
+  },
+  cityName: {
     fontSize: 16,
-    color: '#666666',
+    fontWeight: '600',
+    color: '#FFFFFF',
+    marginBottom: 4,
+  },
+  cityCoords: {
+    fontSize: 12,
+    color: '#999',
+  },
+  deleteButton: {
+    padding: 4,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  modalContent: {
+    width: '100%',
+    maxWidth: 400,
+    backgroundColor: '#1E2528',
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#2A3135',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#2A3135',
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+  },
+  closeButton: {
+    padding: 4,
+  },
+  modalBody: {
+    padding: 20,
+  },
+  input: {
+    backgroundColor: '#0E1214',
+    borderRadius: 12,
+    padding: 16,
+    fontSize: 16,
+    color: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#2A3135',
+    marginBottom: 20,
+  },
+  saveButton: {
+    borderRadius: 12,
+    overflow: 'hidden',
+  },
+  saveButtonGradient: {
+    padding: 16,
+    alignItems: 'center',
+  },
+  saveButtonText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#FFFFFF',
   },
 });
