@@ -1,19 +1,25 @@
-import { View, Text, StyleSheet, ScrollView, StatusBar, Image, FlatList } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, StatusBar, Image, FlatList, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useState, useEffect } from 'react';
+import { useRouter } from 'expo-router';
+import { LinearGradient } from 'expo-linear-gradient';
 
-// Componente para card com fundo chapado
+// Componente para card com gradiente
 const SolidCard = ({ children, style }) => (
   <View style={[styles.cardWrapper, style]}>
-    <View style={styles.cardContainer}>
+    <LinearGradient
+      colors={["#60D7E9", "#2A91D4"]}
+      style={styles.cardContainer}
+    >
       <View style={styles.cardContent}>
         {children}
       </View>
-    </View>
+    </LinearGradient>
   </View>
 );
 
 export default function HomeScreen() {
+  const router = useRouter();
   const [currentTime, setCurrentTime] = useState(new Date());
   const [weatherData, setWeatherData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -147,23 +153,36 @@ export default function HomeScreen() {
               loading ? (
                 <SolidCard key={index} style={styles.weatherCard}>
                   <Text style={styles.cityName}>{item.name}</Text>
-                  <View style={styles.weatherInfo}>
+                  <View style={styles.weatherInfoBottom}>
                     <Ionicons name="hourglass" size={32} color="#FFFFFF" />
                     <Text style={styles.temperature}>--°</Text>
                   </View>
                 </SolidCard>
               ) : (
-                <SolidCard key={index} style={styles.weatherCard}>
-                  <Text style={styles.cityName}>{item.name}</Text>
-                  <View style={styles.weatherInfo}>
-                    <Ionicons 
-                      name={getWeatherIcon(item.weatherCode)} 
-                      size={40} 
-                      color="#FFFFFF" 
-                    />
-                    <Text style={styles.temperature}>{item.temperature}°</Text>
-                  </View>
-                </SolidCard>
+                <TouchableOpacity
+                  key={index}
+                  onPress={() => router.push({
+                    pathname: '/details',
+                    params: {
+                      cityName: item.name,
+                      temperature: item.temperature,
+                      weatherCode: item.weatherCode
+                    }
+                  })}
+                  activeOpacity={0.8}
+                >
+                  <SolidCard style={styles.weatherCard}>
+                    <Text style={styles.cityName}>{item.name}</Text>
+                    <View style={styles.weatherInfoBottom}>
+                      <Ionicons 
+                        name={getWeatherIcon(item.weatherCode)} 
+                        size={32} 
+                        color="#FFFFFF" 
+                      />
+                      <Text style={styles.temperature}>{item.temperature}°</Text>
+                    </View>
+                  </SolidCard>
+                </TouchableOpacity>
               )
             )}
           />
@@ -222,48 +241,46 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   weatherCard: {
-    width: 220,
-    height: 180,
+    width: 180,
+    height: 140,
     marginRight: 15,
   },
   cardWrapper: {
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 10,
-    },
-    shadowOpacity: 0.35,
-    shadowRadius: 15,
-    elevation: 18,
+    // Sombra removida
   },
   cardContainer: {
-    backgroundColor: '#3EBDD9',
     borderRadius: 20,
     height: '100%',
     overflow: 'hidden',
   },
   cardContent: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'space-around',
-    paddingVertical: 25,
-    paddingHorizontal: 20,
+    justifyContent: 'space-between',
+    paddingVertical: 15,
+    paddingHorizontal: 15,
   },
   cityName: {
-    fontSize: 18,
+    fontSize: 16,
     color: '#FFFFFF',
     fontWeight: '700',
     letterSpacing: 0.8,
     textShadowColor: 'rgba(0, 0, 0, 0.2)',
     textShadowOffset: { width: 0, height: 2 },
     textShadowRadius: 3,
+    alignSelf: 'flex-start',
   },
   weatherInfo: {
     alignItems: 'center',
     gap: 12,
   },
+  weatherInfoBottom: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
+    width: '100%',
+  },
   temperature: {
-    fontSize: 36,
+    fontSize: 28,
     fontWeight: 'bold',
     color: '#FFFFFF',
     textShadowColor: 'rgba(0, 0, 0, 0.25)',
