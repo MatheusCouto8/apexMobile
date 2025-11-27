@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { router, Stack } from 'expo-router';
 
 export default function NotFound() {
@@ -7,11 +7,17 @@ export default function NotFound() {
     <>
       <Stack.Screen options={{ headerShown: false }} />
       <View style={styles.container}>
-        <Text style={styles.code}>404</Text>
-        <Text style={styles.message}>Página não encontrada</Text>
-        <TouchableOpacity style={styles.button} onPress={() => router.push('/')}>
-          <Text style={styles.buttonText}>Voltar para início</Text>
-        </TouchableOpacity>
+        <View style={styles.header}>
+          <Image source={require('./logo-apex.jpg')} style={styles.logo} />
+        </View>
+
+        <View style={styles.content}>
+          <Text style={styles.code}>404</Text>
+          <Text style={styles.message}>Página não encontrada</Text>
+          <TouchableOpacity style={styles.button} onPress={() => router.push('/')}>
+            <Text style={styles.buttonText}>Voltar para início</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </>
   );
@@ -20,10 +26,24 @@ export default function NotFound() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: 'rgba(23, 28, 32, 1)',
+  },
+  header: {
+    paddingTop: 50,
+    paddingBottom: 20,
+    alignItems: 'center',
+  },
+  logo: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+  },
+  content: {
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 24,
-    backgroundColor: '#000000ff',
+    marginTop: -80,
   },
   code: {
     fontSize: 72,
