@@ -1,35 +1,47 @@
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { View, Animated } from 'react-native';
+import { BlurView } from 'expo-blur';
 
 export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: '#3EBDD9',
-        tabBarInactiveTintColor: '#6B7280',
+        tabBarActiveTintColor: '#60D7E9',
+        tabBarInactiveTintColor: '#9CA3AF',
         headerStyle: {
-          backgroundColor: '#F8F9FA',
+          backgroundColor: '#0F1113',
+          borderBottomWidth: 1,
+          borderBottomColor: '#1F2937',
+          elevation: 0,
+          shadowColor: 'transparent',
         },
-        headerTintColor: '#000',
+        headerTintColor: '#F3F4F6',
+        headerTitleStyle: {
+          fontSize: 20,
+          fontWeight: '700',
+          letterSpacing: 0.5,
+        },
         tabBarStyle: {
           position: 'absolute',
-          backgroundColor: '#171C20',
-          borderTopWidth: 0,
-          borderTopColor: 'transparent',
+          backgroundColor: 'rgba(15, 17, 19, 0.95)',
+          borderTopWidth: 1,
+          borderTopColor: 'rgba(96, 215, 233, 0.15)',
           borderWidth: 0,
-          elevation: 0,
-          shadowOpacity: 0,
-          shadowColor: 'transparent',
-          shadowOffset: { width: 0, height: 0 },
-          shadowRadius: 0,
-          height: 65,
-          paddingBottom: 10,
-          paddingTop: 10,
+          elevation: 8,
+          shadowOpacity: 0.15,
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: -3 },
+          shadowRadius: 8,
+          height: 70,
+          paddingBottom: 12,
+          paddingTop: 8,
           left: 0,
           right: 0,
           bottom: 0,
         },
         tabBarShowLabel: false,
+        animationEnabled: true,
       }}
     >
       <Tabs.Screen
@@ -44,18 +56,41 @@ export default function TabLayout() {
         name="home"
         options={{
           headerShown: false,
+          title: 'Home',
           tabBarIcon: ({ color, size, focused }) => (
-            <Ionicons name={focused ? "home" : "home-outline"} size={28} color={color} />
+            <View style={{ 
+              alignItems: 'center', 
+              justifyContent: 'center',
+              paddingVertical: 4,
+              opacity: focused ? 1 : 0.7,
+            }}>
+              <Ionicons 
+                name={focused ? "home" : "home-outline"} 
+                size={26} 
+                color={color}
+              />
+            </View>
           ),
         }}
       />
       <Tabs.Screen
         name="settings"
         options={{
-          title: 'Settings',
           headerShown: false,
+          title: 'Mensagens',
           tabBarIcon: ({ color, size, focused }) => (
-            <Ionicons name={focused ? "send" : "send-outline"} size={28} color={color} />
+            <View style={{ 
+              alignItems: 'center', 
+              justifyContent: 'center',
+              paddingVertical: 4,
+              opacity: focused ? 1 : 0.7,
+            }}>
+              <Ionicons 
+                name={focused ? "send" : "send-outline"} 
+                size={26} 
+                color={color}
+              />
+            </View>
           ),
         }}
       />
