@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, TextInput, Modal, Alert, Animated } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, TextInput, Modal, Alert, Animated, StatusBar } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useState, useEffect, useRef } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -117,27 +117,43 @@ export default function SettingsScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Header com logo */}
-      <View style={styles.header}>
-        <Image source={require('../logo-apex.jpg')} style={styles.logo} />
-      </View>
+      <StatusBar barStyle="light-content" backgroundColor="#0F1113" />
+      
+      {/* Header Premium */}
+      <LinearGradient
+        colors={['#0F1113', '#1A1E23']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.header}
+      >
+        <View style={styles.headerContent}>
+          <Image source={require('../logo-apex.jpg')} style={styles.logo} />
+          <View style={styles.headerText}>
+            <Text style={styles.headerTitle}>Gerenciar Cidades</Text>
+            <Text style={styles.headerSubtitle}>Configure suas localizações</Text>
+          </View>
+        </View>
+      </LinearGradient>
 
-      {/* Título e Botão */}
+      {/* Conteúdo Principal */}
       <View style={styles.topSection}>
         <View style={styles.titleSection}>
-          <Text style={styles.title}>Cidades</Text>
+          <View style={styles.titleHeader}>
+            <Ionicons name="location-outline" size={24} color="#60D7E9" />
+            <Text style={styles.title}>Minhas Cidades</Text>
+          </View>
           <Text style={styles.subtitle}>{cities.length} cidade{cities.length !== 1 ? 's' : ''} salva{cities.length !== 1 ? 's' : ''}</Text>
         </View>
 
         <TouchableOpacity 
           onPress={() => setModalVisible(true)}
-          activeOpacity={0.9}
+          activeOpacity={0.8}
         >
           <LinearGradient
             colors={["#60D7E9", "#2A91D4"]}
-            style={styles.addButton}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
+            style={styles.addButton}
           >
             <Ionicons name="add" size={24} color="#FFFFFF" />
             <Text style={styles.addButtonText}>Nova Cidade</Text>
@@ -233,17 +249,41 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#171C20',
+    backgroundColor: '#0F1113',
   },
   header: {
-    paddingTop: 50,
-    paddingBottom: 20,
+    paddingTop: 20,
+    paddingBottom: 24,
+    paddingHorizontal: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(96, 215, 233, 0.1)',
+  },
+  headerContent: {
+    flexDirection: 'row',
     alignItems: 'center',
+    gap: 14,
   },
   logo: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    borderWidth: 2,
+    borderColor: '#60D7E9',
+  },
+  headerText: {
+    flex: 1,
+  },
+  headerTitle: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#F3F4F6',
+    letterSpacing: 0.5,
+  },
+  headerSubtitle: {
+    fontSize: 12,
+    color: '#9CA3AF',
+    marginTop: 4,
+    letterSpacing: 0.3,
   },
   content: {
     flex: 1,
@@ -259,53 +299,61 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     borderBottomWidth: 1,
-    borderBottomColor: '#2A3135',
+    borderBottomColor: 'rgba(96, 215, 233, 0.1)',
   },
   titleSection: {
     flex: 1,
   },
+  titleHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 8,
+  },
   title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
-    marginBottom: 4,
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#F3F4F6',
+    letterSpacing: 0.3,
   },
   subtitle: {
-    fontSize: 13,
-    color: '#999',
+    fontSize: 12,
+    color: '#9CA3AF',
+    fontWeight: '500',
   },
   addButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
     borderRadius: 12,
     gap: 8,
     shadowColor: '#60D7E9',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 4,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 5,
   },
   addButtonText: {
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: '700',
     color: '#FFFFFF',
+    letterSpacing: 0.3,
   },
   citiesSection: {
     gap: 12,
-    paddingTop: 20,
+    paddingTop: 12,
   },
   cityCard: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#1E2528',
-    borderRadius: 12,
+    backgroundColor: 'rgba(96, 215, 233, 0.08)',
+    borderRadius: 14,
     padding: 16,
     borderWidth: 1,
-    borderColor: '#2A3135',
+    borderColor: 'rgba(96, 215, 233, 0.15)',
   },
   cityCardLeft: {
     flexDirection: 'row',
@@ -317,17 +365,19 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   cityName: {
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 15,
+    fontWeight: '700',
     color: '#FFFFFF',
     marginBottom: 4,
+    letterSpacing: 0.2,
   },
   cityCoords: {
-    fontSize: 12,
-    color: '#999',
+    fontSize: 11,
+    color: '#9CA3AF',
+    fontWeight: '500',
   },
   deleteButton: {
-    padding: 4,
+    padding: 8,
   },
   modalOverlay: {
     flex: 1,

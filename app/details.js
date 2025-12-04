@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from "react-native";
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, StatusBar } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -94,29 +94,52 @@ export default function DetailsScreen() {
   if (loading || !weatherDetails) {
     return (
       <View style={styles.container}>
-        <View style={styles.loadingContainer}>
-          <Text style={styles.loadingText}>Carregando...</Text>
-        </View>
+        <StatusBar barStyle="light-content" backgroundColor="#0F1113" />
+        <LinearGradient
+          colors={['#0F1113', '#1A1E23']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.loadingContainer}
+        >
+          <Ionicons name="hourglass" size={50} color="#60D7E9" />
+          <Text style={styles.loadingText}>Carregando detalhes...</Text>
+        </LinearGradient>
       </View>
     );
   }
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+      <StatusBar barStyle="light-content" backgroundColor="#0F1113" />
       
-      {/* LOGO COM BOTÃO VOLTAR */}
-      <View style={styles.logoArea}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Ionicons name="arrow-back" size={28} color="#FFFFFF" />
+      {/* Header Premium */}
+      <LinearGradient
+        colors={['#0F1113', '#1A1E23']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.header}
+      >
+        <TouchableOpacity 
+          onPress={() => router.back()} 
+          style={styles.backButton}
+        >
+          <Ionicons name="arrow-back" size={24} color="#60D7E9" />
         </TouchableOpacity>
-        <View style={styles.logoCenter}>
-          <Image source={require('./logo-apex.jpg')} style={styles.logo} />
+        <View style={styles.headerContent}>
+          <View>
+            <Text style={styles.cityName}>{params.cityName}</Text>
+            <Text style={styles.headerSubtitle}>Detalhes do clima</Text>
+          </View>
         </View>
-      </View>
+        <View style={{ width: 24 }} />
+      </LinearGradient>
 
       {/* CARD PRINCIPAL */}
+      <View style={styles.contentPadding}>
       <LinearGradient
         colors={["#60D7E9", "#2A91D4"]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
         style={styles.mainCard}
       >
         <View>
@@ -168,6 +191,7 @@ export default function DetailsScreen() {
           ))}
         </ScrollView>
       </LinearGradient>
+      </View>
 
     </ScrollView>
   );
@@ -176,75 +200,87 @@ export default function DetailsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#0F1215",
+    backgroundColor: "#0F1113",
   },
-
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingTop: 12,
+    paddingBottom: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(96, 215, 233, 0.1)',
+  },
+  backButton: {
+    padding: 8,
+  },
+  headerContent: {
+    flex: 1,
+    marginLeft: 12,
+  },
+  cityName: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#F3F4F6',
+    letterSpacing: 0.3,
+  },
+  headerSubtitle: {
+    fontSize: 12,
+    color: '#9CA3AF',
+    marginTop: 2,
+  },
+  contentPadding: {
+    paddingHorizontal: 16,
+    paddingVertical: 20,
+  },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    gap: 16,
   },
-
   loadingText: {
-    color: '#AEE1FF',
-    fontSize: 18,
-  },
-
-  logoArea: {
-    alignItems: "center",
-    paddingTop: 50,
-    paddingBottom: 20,
-    position: 'relative',
-  },
-
-  backButton: {
-    position: 'absolute',
-    left: 20,
-    top: 50,
-    zIndex: 10,
-  },
-
-  logoCenter: {
-    alignItems: 'center',
-  },
-
-  logo: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: 'transparent',
+    color: '#D1D5DB',
+    fontSize: 16,
+    fontWeight: '500',
+    letterSpacing: 0.3,
   },
 
   mainCard: {
-    width: "90%",
-    alignSelf: "center",
-    borderRadius: 18,
-    padding: 20,
+    borderRadius: 20,
+    padding: 24,
     marginBottom: 20,
+    shadowColor: '#60D7E9',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.25,
+    shadowRadius: 16,
+    elevation: 8,
   },
-
   city: {
-    fontSize: 22,
-    fontWeight: "600",
+    fontSize: 18,
+    fontWeight: "700",
     color: "#fff",
+    marginBottom: 8,
+    letterSpacing: 0.3,
   },
-
   temperature: {
-    fontSize: 50,
+    fontSize: 56,
     color: "#fff",
     fontWeight: "700",
+    letterSpacing: 2,
   },
-
   weatherDesc: {
     color: "#fff",
-    marginLeft: 8,
-    fontSize: 16,
+    marginLeft: 16,
+    fontSize: 14,
+    fontWeight: '600',
   },
-
   minmax: {
-    marginTop: 15,
+    marginTop: 16,
     color: "#fff",
     fontSize: 14,
+    fontWeight: '600',
+    letterSpacing: 0.3,
   },
 
   hourCard: {

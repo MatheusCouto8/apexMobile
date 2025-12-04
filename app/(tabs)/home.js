@@ -6,11 +6,13 @@ import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
 
-// Componente para card com gradiente
-const SolidCard = ({ children, style }) => (
+// Componente premium para card com gradiente
+const PremiumCard = ({ children, style }) => (
   <View style={[styles.cardWrapper, style]}>
     <LinearGradient
       colors={["#60D7E9", "#2A91D4"]}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
       style={styles.cardContainer}
     >
       <View style={styles.cardContent}>
@@ -137,26 +139,74 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#2C3E50" />
+      <StatusBar barStyle="light-content" backgroundColor="#0F1113" />
       
-      {/* Header com logo */}
-      <View style={styles.header}>
-        <Image source={require('../logo-apex.jpg')} style={styles.logo} />
-      </View>
+      {/* Header Premium */}
+      <LinearGradient
+        colors={['#0F1113', '#1A1E23']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.header}
+      >
+        <View style={styles.headerContent}>
+          <Image source={require('../logo-apex.jpg')} style={styles.logo} />
+          <View style={styles.headerText}>
+            <Text style={styles.headerTitle}>ApexMobile</Text>
+            <Text style={styles.headerSubtitle}>Clima & Relógio Inteligente</Text>
+          </View>
+        </View>
+      </LinearGradient>
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {/* Saudação */}
+      <ScrollView 
+        style={styles.content} 
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 100 }}
+      >
+        {/* Saudação Elegante */}
         <View style={styles.greetingSection}>
-          <Text style={styles.greeting}>{getGreeting()}!</Text>
-          <Text style={styles.subGreeting}>
-            {todayWeather 
-              ? `Hoje o dia será ${getWeatherDescription(todayWeather.weatherCode)}`
-              : 'Carregando informações do clima...'
-            }
-          </Text>
+          <Text style={styles.greeting}>{getGreeting()}! 👋</Text>
+          <View style={styles.weatherDescriptionBox}>
+            <Ionicons 
+              name={todayWeather ? getWeatherIcon(todayWeather.weatherCode) : 'cloudy'} 
+              size={20} 
+              color="#60D7E9" 
+            />
+            <Text style={styles.subGreeting}>
+              {todayWeather 
+                ? `Hoje será ${getWeatherDescription(todayWeather.weatherCode)}`
+                : 'Carregando informações do clima...'
+              }
+            </Text>
+          </View>
         </View>
 
-        {/* Cards de clima - Carrossel */}
+        {/* Seção de Relógio Digital Premium */}
+        <LinearGradient
+          colors={['rgba(96, 215, 233, 0.1)', 'rgba(42, 145, 212, 0.1)']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.clockContainer}
+        >
+          <View style={styles.clockContent}>
+            <Text style={styles.time}>{getCurrentTime()}</Text>
+            <View style={styles.dateWrapper}>
+              <Ionicons name="calendar-outline" size={14} color="#60D7E9" />
+              <Text style={styles.date}>{getCurrentDate()}</Text>
+            </View>
+          </View>
+          <View style={styles.clockDecoration} />
+        </LinearGradient>
+
+        {/* Título do Carrossel */}
+        <View style={styles.carouselHeaderSection}>
+          <View style={styles.carouselHeader}>
+            <Ionicons name="location" size={20} color="#60D7E9" />
+            <Text style={styles.carouselTitle}>Cidades</Text>
+          </View>
+          <Text style={styles.carouselSubtitle}>Deslize para mais informações</Text>
+        </View>
+
+        {/* Cards de clima - Carrossel Elegante */}
         <View style={styles.carouselWrapper}>
           <FlatList
             data={loading ? cities : weatherData}
@@ -169,13 +219,13 @@ export default function HomeScreen() {
             keyExtractor={(item, index) => index.toString()}
             renderItem={({ item, index }) => (
               loading ? (
-                <SolidCard key={index} style={styles.weatherCard}>
+                <PremiumCard key={index} style={styles.weatherCard}>
                   <Text style={styles.cityName}>{item.name}</Text>
                   <View style={styles.weatherInfoBottom}>
                     <Ionicons name="hourglass" size={32} color="#FFFFFF" />
                     <Text style={styles.temperature}>--°</Text>
                   </View>
-                </SolidCard>
+                </PremiumCard>
               ) : (
                 <TouchableOpacity
                   key={index}
@@ -190,8 +240,9 @@ export default function HomeScreen() {
                     }
                   })}
                   activeOpacity={0.8}
+                  style={styles.cardTouchable}
                 >
-                  <SolidCard style={styles.weatherCard}>
+                  <PremiumCard style={styles.weatherCard}>
                     <Text style={styles.cityName}>{item.name}</Text>
                     <View style={styles.weatherInfoBottom}>
                       <Ionicons 
@@ -201,17 +252,17 @@ export default function HomeScreen() {
                       />
                       <Text style={styles.temperature}>{item.temperature}°</Text>
                     </View>
-                  </SolidCard>
+                  </PremiumCard>
                 </TouchableOpacity>
               )
             )}
           />
         </View>
 
-        {/* Relógio central */}
-        <View style={styles.clockSection}>
-          <Text style={styles.time}>{getCurrentTime()}</Text>
-          <Text style={styles.date}>{getCurrentDate()}</Text>
+        {/* Rodapé com dica */}
+        <View style={styles.footerTip}>
+          <Ionicons name="information-circle-outline" size={18} color="#60D7E9" />
+          <Text style={styles.tipText}>Toque em uma cidade para ver detalhes completos</Text>
         </View>
       </ScrollView>
     </View>
@@ -221,38 +272,139 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'rgba(23, 28, 32, 1)',
+    backgroundColor: '#0F1113',
   },
   header: {
-    paddingTop: 50,
-    paddingBottom: 20,
+    paddingTop: 20,
+    paddingBottom: 24,
+    paddingHorizontal: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(96, 215, 233, 0.1)',
+  },
+  headerContent: {
+    flexDirection: 'row',
     alignItems: 'center',
+    gap: 14,
   },
   logo: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#3498DB',
-    letterSpacing: 2,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    borderWidth: 2,
+    borderColor: '#60D7E9',
+  },
+  headerText: {
+    flex: 1,
+  },
+  headerTitle: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#F3F4F6',
+    letterSpacing: 0.5,
+  },
+  headerSubtitle: {
+    fontSize: 12,
+    color: '#9CA3AF',
+    marginTop: 4,
+    letterSpacing: 0.3,
   },
   content: {
     flex: 1,
     paddingHorizontal: 20,
   },
   greetingSection: {
-    marginBottom: 30,
+    marginTop: 28,
+    marginBottom: 28,
   },
   greeting: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
-    marginBottom: 5,
+    fontSize: 28,
+    fontWeight: '700',
+    color: '#F3F4F6',
+    marginBottom: 12,
+    letterSpacing: 0.5,
+  },
+  weatherDescriptionBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    backgroundColor: 'rgba(96, 215, 233, 0.08)',
+    borderRadius: 12,
+    borderLeftWidth: 3,
+    borderLeftColor: '#60D7E9',
   },
   subGreeting: {
-    fontSize: 16,
-    color: '#BDC3C7',
+    fontSize: 14,
+    color: '#D1D5DB',
+    fontWeight: '500',
+  },
+  clockContainer: {
+    marginBottom: 32,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(96, 215, 233, 0.2)',
+    overflow: 'hidden',
+    shadowColor: '#60D7E9',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 5,
+  },
+  clockContent: {
+    paddingVertical: 24,
+    paddingHorizontal: 20,
+    alignItems: 'center',
+  },
+  time: {
+    fontSize: 54,
+    fontWeight: '200',
+    color: '#F3F4F6',
+    letterSpacing: 2,
+    marginBottom: 12,
+  },
+  dateWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    backgroundColor: 'rgba(96, 215, 233, 0.12)',
+    borderRadius: 8,
+  },
+  date: {
+    fontSize: 13,
+    color: '#D1D5DB',
+    fontWeight: '500',
+    letterSpacing: 0.3,
+  },
+  clockDecoration: {
+    height: 2,
+    backgroundColor: 'rgba(96, 215, 233, 0.3)',
+  },
+  carouselHeaderSection: {
+    marginBottom: 20,
+  },
+  carouselHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 6,
+  },
+  carouselTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#F3F4F6',
+    letterSpacing: 0.3,
+  },
+  carouselSubtitle: {
+    fontSize: 12,
+    color: '#9CA3AF',
+    marginLeft: 30,
+    letterSpacing: 0.2,
   },
   carouselWrapper: {
-    marginBottom: 40,
+    marginBottom: 32,
     marginLeft: -20,
     marginRight: -20,
   },
@@ -260,38 +412,44 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 10,
   },
-  weatherCard: {
-    width: 180,
-    height: 140,
+  cardTouchable: {
     marginRight: 15,
   },
+  weatherCard: {
+    width: 200,
+    height: 160,
+    borderRadius: 18,
+    overflow: 'hidden',
+    shadowColor: '#60D7E9',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.25,
+    shadowRadius: 16,
+    elevation: 8,
+  },
   cardWrapper: {
-    // Sombra removida
+    borderRadius: 18,
+    overflow: 'hidden',
   },
   cardContainer: {
-    borderRadius: 20,
+    borderRadius: 18,
     height: '100%',
     overflow: 'hidden',
   },
   cardContent: {
     flex: 1,
     justifyContent: 'space-between',
-    paddingVertical: 15,
-    paddingHorizontal: 15,
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
   },
   cityName: {
     fontSize: 16,
     color: '#FFFFFF',
     fontWeight: '700',
-    letterSpacing: 0.8,
-    textShadowColor: 'rgba(0, 0, 0, 0.2)',
+    letterSpacing: 0.5,
+    textShadowColor: 'rgba(0, 0, 0, 0.3)',
     textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 3,
-    alignSelf: 'flex-start',
-  },
-  weatherInfo: {
-    alignItems: 'center',
-    gap: 12,
+    textShadowRadius: 4,
   },
   weatherInfoBottom: {
     flexDirection: 'row',
@@ -300,31 +458,31 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   temperature: {
-    fontSize: 28,
-    fontWeight: 'bold',
+    fontSize: 32,
+    fontWeight: '700',
     color: '#FFFFFF',
-    textShadowColor: 'rgba(0, 0, 0, 0.25)',
+    textShadowColor: 'rgba(0, 0, 0, 0.4)',
     textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 5,
-    letterSpacing: 1.5,
+    textShadowRadius: 6,
+    letterSpacing: 1,
   },
-  clockSection: {
+  footerTip: {
+    flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 30,
+    gap: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    backgroundColor: 'rgba(96, 215, 233, 0.08)',
+    borderRadius: 10,
+    marginTop: 16,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(96, 215, 233, 0.15)',
   },
-  time: {
-    fontSize: 48,
-    fontWeight: '300',
-    color: '#FFFFFF',
-    marginBottom: 10,
-  },
-  date: {
-    fontSize: 16,
-    color: '#BDC3C7',
-  },
-  logo: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+  tipText: {
+    fontSize: 12,
+    color: '#9CA3AF',
+    fontWeight: '500',
+    letterSpacing: 0.2,
   },
 });
