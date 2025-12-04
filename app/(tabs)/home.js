@@ -142,16 +142,11 @@ export default function HomeScreen() {
       <StatusBar barStyle="light-content" backgroundColor="#0F1113" />
       
       {/* Header Premium */}
-      <LinearGradient
-        colors={['#0F1113', '#1A1E23']}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={styles.header}
-      >
+      <View style={styles.header}>
         <View style={styles.headerContent}>
           <Image source={require('../logo-apex.jpg')} style={styles.logo} />
         </View>
-      </LinearGradient>
+      </View>
 
       <ScrollView 
         style={styles.content} 
@@ -254,12 +249,6 @@ export default function HomeScreen() {
             )}
           />
         </View>
-
-        {/* Rodapé com dica */}
-        <View style={styles.footerTip}>
-          <Ionicons name="information-circle-outline" size={18} color="#60D7E9" />
-          <Text style={styles.tipText}>Toque em uma cidade para ver detalhes completos</Text>
-        </View>
       </ScrollView>
     </View>
   );
@@ -271,11 +260,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#0F1113',
   },
   header: {
-    paddingTop: 20,
+    paddingTop: 85,
     paddingBottom: 24,
     paddingHorizontal: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(96, 215, 233, 0.1)',
+    backgroundColor: '#0F1113',
   },
   headerContent: {
     flex: 1,
@@ -283,9 +271,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   logo: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    width: 65,
+    height: 65,
+    borderRadius: 32.5,
   },
   content: {
     flex: 1,

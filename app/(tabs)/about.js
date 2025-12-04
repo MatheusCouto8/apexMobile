@@ -8,16 +8,11 @@ export default function AboutScreen() {
       <StatusBar barStyle="light-content" backgroundColor="#0F1113" />
       
       {/* Header Premium com Logo */}
-      <LinearGradient
-        colors={['#0F1113', '#1A1E23']}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={styles.header}
-      >
+      <View style={styles.header}>
         <View style={styles.headerContent}>
           <Image source={require('../logo-apex.jpg')} style={styles.logo} />
         </View>
-      </LinearGradient>
+      </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.section}>
@@ -74,10 +69,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 16,
-    paddingTop: 12,
+    paddingTop: 85,
     paddingBottom: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(96, 215, 233, 0.1)',
+    backgroundColor: '#0F1113',
   },
   headerContent: {
     flex: 1,
@@ -85,9 +79,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   logo: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    width: 65,
+    height: 65,
+    borderRadius: 32.5,
   },
   content: {
     flex: 1,

@@ -2,19 +2,24 @@ import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { View, Animated } from 'react-native';
 import { BlurView } from 'expo-blur';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function TabLayout() {
+  const insets = useSafeAreaInsets();
   return (
     <Tabs
-      screenOptions={{
+      screenOptions={() => ({
         tabBarActiveTintColor: '#60D7E9',
         tabBarInactiveTintColor: '#9CA3AF',
         headerStyle: {
-          backgroundColor: '#0F1113',
-          borderBottomWidth: 1,
-          borderBottomColor: '#1F2937',
+          backgroundColor: 'transparent',
+          borderBottomWidth: 0,
+          borderBottomColor: 'transparent',
           elevation: 0,
           shadowColor: 'transparent',
+          // reserve space for status bar / notch
+          paddingTop: insets.top,
+          height: 56 + insets.top,
         },
         headerTintColor: '#F3F4F6',
         headerTitleStyle: {
@@ -33,8 +38,9 @@ export default function TabLayout() {
           shadowColor: '#000',
           shadowOffset: { width: 0, height: -3 },
           shadowRadius: 8,
-          height: 70,
-          paddingBottom: 12,
+          // add safe-area bottom inset so the bar isn't cut on iPhone X/11/12/13/14
+          height: 60 + insets.bottom,
+          paddingBottom: 8 + insets.bottom,
           paddingTop: 8,
           left: 0,
           right: 0,
@@ -42,7 +48,7 @@ export default function TabLayout() {
         },
         tabBarShowLabel: false,
         animationEnabled: true,
-      }}
+      })}
     >
       <Tabs.Screen
         name="index"
@@ -66,7 +72,7 @@ export default function TabLayout() {
             }}>
               <Ionicons 
                 name={focused ? "home" : "home-outline"} 
-                size={26} 
+                size={24} 
                 color={color}
               />
             </View>
@@ -87,7 +93,7 @@ export default function TabLayout() {
             }}>
               <Ionicons 
                 name={focused ? "send" : "send-outline"} 
-                size={26} 
+                size={24} 
                 color={color}
               />
             </View>
