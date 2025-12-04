@@ -150,10 +150,6 @@ export default function HomeScreen() {
       >
         <View style={styles.headerContent}>
           <Image source={require('../logo-apex.jpg')} style={styles.logo} />
-          <View style={styles.headerText}>
-            <Text style={styles.headerTitle}>ApexMobile</Text>
-            <Text style={styles.headerSubtitle}>Clima & Relógio Inteligente</Text>
-          </View>
         </View>
       </LinearGradient>
 
@@ -282,31 +278,14 @@ const styles = StyleSheet.create({
     borderBottomColor: 'rgba(96, 215, 233, 0.1)',
   },
   headerContent: {
-    flexDirection: 'row',
+    flex: 1,
     alignItems: 'center',
-    gap: 14,
+    justifyContent: 'center',
   },
   logo: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    borderWidth: 2,
-    borderColor: '#60D7E9',
-  },
-  headerText: {
-    flex: 1,
-  },
-  headerTitle: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: '#F3F4F6',
-    letterSpacing: 0.5,
-  },
-  headerSubtitle: {
-    fontSize: 12,
-    color: '#9CA3AF',
-    marginTop: 4,
-    letterSpacing: 0.3,
+    width: 50,
+    height: 50,
+    borderRadius: 25,
   },
   content: {
     flex: 1,
