@@ -110,6 +110,7 @@ export default function TabLayout() {
         name="about"
         options={{
           href: null,
+          headerShown: false,
         }}
       />
     </Tabs>

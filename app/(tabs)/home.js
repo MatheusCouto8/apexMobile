@@ -38,12 +38,24 @@ export default function HomeScreen() {
     checkFirstTime();
   }, []);
 
-  // Recarregar cidades quando a tela ganha foco
+  // Recarregar cidades e nome do usuário quando a tela ganha foco
   useFocusEffect(
     React.useCallback(() => {
       loadCities();
+      loadUserName();
     }, [])
   );
+
+  const loadUserName = async () => {
+    try {
+      const savedUserName = await AsyncStorage.getItem('userName');
+      if (savedUserName) {
+        setUserName(savedUserName);
+      }
+    } catch (error) {
+      console.error('Erro ao carregar nome do usuário:', error);
+    }
+  };
 
   const checkFirstTime = async () => {
     try {
@@ -193,7 +205,9 @@ export default function HomeScreen() {
       {/* Header Premium */}
       <View style={styles.header}>
         <View style={styles.headerContent}>
-          <Image source={require('../logo-apex.jpg')} style={styles.logo} />
+          <TouchableOpacity onPress={() => router.push('/(tabs)/about')}>
+            <Image source={require('../logo-apex.jpg')} style={styles.logo} />
+          </TouchableOpacity>
         </View>
       </View>
 
