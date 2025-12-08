@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, StatusBar, Image, FlatList, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, StatusBar, Image, FlatList, TouchableOpacity, Modal, TextInput, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -29,10 +29,13 @@ export default function HomeScreen() {
   const [loading, setLoading] = useState(true);
   const [todayWeather, setTodayWeather] = useState(null);
   const [cities, setCities] = useState([]);
+  const [userName, setUserName] = useState('');
+  const [welcomeModalVisible, setWelcomeModalVisible] = useState(false);
+  const [inputUserName, setInputUserName] = useState('');
 
-  // Carregar cidades na inicialização
+  // Carregar usuário e mostrar boas-vindas se for primeira vez
   useEffect(() => {
-    loadCities();
+    checkFirstTime();
   }, []);
 
   // Recarregar cidades quando a tela ganha foco
@@ -41,6 +44,37 @@ export default function HomeScreen() {
       loadCities();
     }, [])
   );
+
+  const checkFirstTime = async () => {
+    try {
+      const savedUserName = await AsyncStorage.getItem('userName');
+      if (savedUserName) {
+        setUserName(savedUserName);
+      } else {
+        // Primeira vez no app
+        setWelcomeModalVisible(true);
+      }
+    } catch (error) {
+      console.error('Erro ao verificar primeira vez:', error);
+    }
+  };
+
+  const handleSaveUserName = async () => {
+    if (!inputUserName.trim()) {
+      Alert.alert('Erro', 'Por favor, digite seu nome');
+      return;
+    }
+
+    try {
+      await AsyncStorage.setItem('userName', inputUserName.trim());
+      setUserName(inputUserName.trim());
+      setWelcomeModalVisible(false);
+      setInputUserName('');
+      loadCities();
+    } catch (error) {
+      console.error('Erro ao salvar nome do usuário:', error);
+    }
+  };
 
   const loadCities = async () => {
     try {
@@ -166,11 +200,11 @@ export default function HomeScreen() {
       <ScrollView 
         style={styles.content} 
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 100 }}
+        contentContainerStyle={{ paddingBottom: 150 }}
       >
         {/* Saudação Elegante */}
         <View style={styles.greetingSection}>
-          <Text style={styles.greeting}>{getGreeting()}! 👋</Text>
+          <Text style={styles.greeting}>{getGreeting()}, {userName}! 👋</Text>
           <View style={styles.weatherDescriptionBox}>
             <Ionicons 
               name={todayWeather ? getWeatherIcon(todayWeather.weatherCode) : 'cloudy'} 
@@ -179,7 +213,7 @@ export default function HomeScreen() {
             />
             <Text style={styles.subGreeting}>
               {todayWeather 
-                ? `Hoje será ${getWeatherDescription(todayWeather.weatherCode)}`
+                ? `Hoje seu dia será ${getWeatherDescription(todayWeather.weatherCode)}`
                 : 'Carregando informações do clima...'
               }
             </Text>
@@ -187,21 +221,15 @@ export default function HomeScreen() {
         </View>
 
         {/* Seção de Relógio Digital Premium */}
-        <LinearGradient
-          colors={['rgba(96, 215, 233, 0.1)', 'rgba(42, 145, 212, 0.1)']}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.clockContainer}
-        >
+        <View style={styles.clockContainer}>
           <View style={styles.clockContent}>
             <Text style={styles.time}>{getCurrentTime()}</Text>
             <View style={styles.dateWrapper}>
-              <Ionicons name="calendar-outline" size={14} color="#60D7E9" />
+              <Ionicons name="calendar-outline" size={16} color="#60D7E9" />
               <Text style={styles.date}>{getCurrentDate()}</Text>
             </View>
           </View>
-          <View style={styles.clockDecoration} />
-        </LinearGradient>
+        </View>
 
         {/* Título do Carrossel */}
         <View style={styles.carouselHeaderSection}>
@@ -265,6 +293,45 @@ export default function HomeScreen() {
           />
         </View>
       </ScrollView>
+
+      {/* Modal de Boas-vindas */}
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={welcomeModalVisible}
+        onRequestClose={() => {}}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Bem-vindo ao Apex! </Text>
+            <Text style={styles.modalSubtitle}>No topo do clima, sempre um passo à frente.</Text>
+            
+            <TextInput
+              style={styles.modalInput}
+              placeholder="Digite seu nome"
+              placeholderTextColor="#AAAAAA"
+              value={inputUserName}
+              onChangeText={setInputUserName}
+              autoFocus={true}
+            />
+            
+            <TouchableOpacity 
+              style={styles.modalButton}
+              onPress={handleSaveUserName}
+              activeOpacity={0.8}
+            >
+              <LinearGradient
+                colors={["#60D7E9", "#2A91D4"]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={styles.modalButtonGradient}
+              >
+                <Text style={styles.modalButtonText}>Continuar</Text>
+              </LinearGradient>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -322,47 +389,43 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   clockContainer: {
-    marginBottom: 32,
+    marginBottom: 36,
+    paddingTop: 2,
     borderRadius: 20,
-    borderWidth: 1,
-    borderColor: 'rgba(96, 215, 233, 0.2)',
     overflow: 'hidden',
-    shadowColor: '#60D7E9',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
-    elevation: 5,
   },
   clockContent: {
-    paddingVertical: 24,
+    paddingVertical: 32,
     paddingHorizontal: 20,
     alignItems: 'center',
   },
   time: {
-    fontSize: 54,
-    fontWeight: '200',
-    color: '#F3F4F6',
-    letterSpacing: 2,
-    marginBottom: 12,
+    fontSize: 58,
+    fontWeight: '300',
+    color: '#FFFFFF',
+    letterSpacing: 3,
+    marginBottom: 16,
   },
   dateWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    backgroundColor: 'rgba(96, 215, 233, 0.12)',
-    borderRadius: 8,
+    gap: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    backgroundColor: 'rgba(96, 215, 233, 0.15)',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(96, 215, 233, 0.2)',
   },
   date: {
-    fontSize: 13,
+    fontSize: 14,
     color: '#D1D5DB',
-    fontWeight: '500',
-    letterSpacing: 0.3,
+    fontWeight: '600',
+    letterSpacing: 0.4,
   },
   clockDecoration: {
     height: 2,
-    backgroundColor: 'rgba(96, 215, 233, 0.3)',
+    backgroundColor: 'rgba(96, 215, 233, 0.4)',
   },
   carouselHeaderSection: {
     marginBottom: 20,
@@ -386,13 +449,13 @@ const styles = StyleSheet.create({
     letterSpacing: 0.2,
   },
   carouselWrapper: {
-    marginBottom: 32,
+    marginBottom: 50,
     marginLeft: -20,
     marginRight: -20,
   },
   weatherCarousel: {
     paddingHorizontal: 20,
-    paddingVertical: 10,
+    paddingVertical: 15,
   },
   cardTouchable: {
     marginRight: 15,
@@ -402,11 +465,6 @@ const styles = StyleSheet.create({
     height: 160,
     borderRadius: 18,
     overflow: 'hidden',
-    shadowColor: '#60D7E9',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.25,
-    shadowRadius: 16,
-    elevation: 8,
   },
   cardWrapper: {
     borderRadius: 18,
@@ -466,5 +524,61 @@ const styles = StyleSheet.create({
     color: '#9CA3AF',
     fontWeight: '500',
     letterSpacing: 0.2,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  modalContent: {
+    width: '100%',
+    maxWidth: 400,
+    backgroundColor: '#1E2528',
+    borderRadius: 24,
+    padding: 32,
+    borderWidth: 1,
+    borderColor: 'rgba(96, 215, 233, 0.2)',
+  },
+  modalTitle: {
+    fontSize: 28,
+    fontWeight: '800',
+    color: '#FFFFFF',
+    marginBottom: 12,
+    textAlign: 'center',
+    letterSpacing: 0.5,
+  },
+  modalSubtitle: {
+    fontSize: 16,
+    color: '#D1D5DB',
+    marginBottom: 24,
+    textAlign: 'center',
+    fontWeight: '500',
+  },
+  modalInput: {
+    backgroundColor: '#0E1214',
+    borderRadius: 14,
+    padding: 16,
+    fontSize: 16,
+    color: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#2A3135',
+    marginBottom: 20,
+    fontWeight: '500',
+  },
+  modalButton: {
+    borderRadius: 14,
+    overflow: 'hidden',
+  },
+  modalButtonGradient: {
+    paddingVertical: 16,
+    alignItems: 'center',
+  },
+  modalButtonText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    letterSpacing: 0.5,
   },
 });

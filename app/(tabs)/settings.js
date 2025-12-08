@@ -135,21 +135,6 @@ export default function SettingsScreen() {
           </View>
           <Text style={styles.subtitle}>{cities.length} cidade{cities.length !== 1 ? 's' : ''} salva{cities.length !== 1 ? 's' : ''}</Text>
         </View>
-
-        <TouchableOpacity 
-          onPress={() => setModalVisible(true)}
-          activeOpacity={0.8}
-        >
-          <LinearGradient
-            colors={["#60D7E9", "#2A91D4"]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            style={styles.addButton}
-          >
-            <Ionicons name="add" size={24} color="#FFFFFF" />
-            <Text style={styles.addButtonText}>Nova Cidade</Text>
-          </LinearGradient>
-        </TouchableOpacity>
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
@@ -176,6 +161,22 @@ export default function SettingsScreen() {
           ))}
         </View>
       </ScrollView>
+
+      {/* Botão Flutuante no canto inferior direito */}
+      <TouchableOpacity 
+        onPress={() => setModalVisible(true)}
+        activeOpacity={0.8}
+        style={styles.floatingButton}
+      >
+        <LinearGradient
+          colors={["#60D7E9", "#2A91D4"]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.floatingButtonGradient}
+        >
+          <Ionicons name="add" size={28} color="#FFFFFF" />
+        </LinearGradient>
+      </TouchableOpacity>
 
       {/* Modal para adicionar cidade */}
       <Modal
@@ -263,19 +264,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   scrollContent: {
-    paddingBottom: 20,
+    paddingBottom: 120,
   },
   topSection: {
     paddingHorizontal: 20,
     paddingVertical: 20,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(96, 215, 233, 0.1)',
   },
   titleSection: {
-    flex: 1,
+    width: '100%',
   },
   titleHeader: {
     flexDirection: 'row',
@@ -294,25 +292,18 @@ const styles = StyleSheet.create({
     color: '#9CA3AF',
     fontWeight: '500',
   },
-  addButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 12,
-    gap: 8,
-    shadowColor: '#60D7E9',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 5,
+  floatingButton: {
+    position: 'absolute',
+    bottom: 100,
+    right: 20,
+    zIndex: 1000,
   },
-  addButtonText: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: '#FFFFFF',
-    letterSpacing: 0.3,
+  floatingButtonGradient: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   citiesSection: {
     gap: 12,
