@@ -30,7 +30,12 @@ export default function HomeScreen() {
   const [todayWeather, setTodayWeather] = useState(null);
   const [cities, setCities] = useState([]);
 
-  // Carregar cidades do AsyncStorage quando a tela ganha foco
+  // Carregar cidades na inicialização
+  useEffect(() => {
+    loadCities();
+  }, []);
+
+  // Recarregar cidades quando a tela ganha foco
   useFocusEffect(
     React.useCallback(() => {
       loadCities();
@@ -43,6 +48,16 @@ export default function HomeScreen() {
       if (savedCities) {
         const parsedCities = JSON.parse(savedCities);
         setCities(parsedCities);
+      } else {
+        // Cidades padrão caso não existam no AsyncStorage
+        const defaultCities = [
+          { id: 1, name: 'Valinhos', lat: -22.97, lon: -46.99 },
+          { id: 2, name: 'Campinas', lat: -22.91, lon: -47.06 },
+          { id: 3, name: 'São Paulo', lat: -23.55, lon: -46.63 },
+          { id: 4, name: 'Brasília', lat: -15.79, lon: -47.89 }
+        ];
+        setCities(defaultCities);
+        await AsyncStorage.setItem('cities', JSON.stringify(defaultCities));
       }
     } catch (error) {
       console.error('Erro ao carregar cidades:', error);
