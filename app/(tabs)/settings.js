@@ -3,8 +3,10 @@ import { Ionicons } from '@expo/vector-icons';
 import { useState, useEffect, useRef } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useRouter } from 'expo-router';
 
 export default function SettingsScreen() {
+  const router = useRouter();
   const [cities, setCities] = useState([]);
 
   // Carregar cidades do AsyncStorage
@@ -115,6 +117,30 @@ export default function SettingsScreen() {
     }
   };
 
+  const handleCityPress = async (city) => {
+    try {
+      // Buscar dados do clima da cidade
+      const response = await fetch(
+        `https://api.open-meteo.com/v1/forecast?latitude=${city.lat}&longitude=${city.lon}&current_weather=true`
+      );
+      const data = await response.json();
+      
+      router.push({
+        pathname: '/details',
+        params: {
+          cityName: city.name,
+          temperature: Math.round(data.current_weather.temperature),
+          weatherCode: data.current_weather.weathercode,
+          lat: city.lat,
+          lon: city.lon
+        }
+      });
+    } catch (error) {
+      console.error('Erro ao buscar clima:', error);
+      Alert.alert('Erro', 'Não foi possível carregar os detalhes da cidade');
+    }
+  };
+
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#0F1113" />
@@ -128,36 +154,40 @@ export default function SettingsScreen() {
 
       {/* Conteúdo Principal */}
       <View style={styles.topSection}>
-        <View style={styles.titleSection}>
-          <View style={styles.titleHeader}>
-            <Ionicons name="location-outline" size={24} color="#60D7E9" />
-            <Text style={styles.title}>Minhas Cidades</Text>
-          </View>
-          <Text style={styles.subtitle}>{cities.length} cidade{cities.length !== 1 ? 's' : ''} salva{cities.length !== 1 ? 's' : ''}</Text>
-        </View>
+        <Text style={styles.title}>Minhas Cidades</Text>
+        <Text style={styles.subtitle}>{cities.length} {cities.length !== 1 ? 'cidades' : 'cidade'}</Text>
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
         {/* Lista de Cidades */}
         <View style={styles.citiesSection}>
           {cities.map((city) => (
-            <View key={city.id} style={styles.cityCard}>
-              <View style={styles.cityCardLeft}>
-                <Ionicons name="location-outline" size={24} color="#60D7E9" />
-                <View style={styles.cityDetails}>
+            <TouchableOpacity 
+              key={city.id} 
+              style={styles.cityCard}
+              onPress={() => handleCityPress(city)}
+              activeOpacity={0.7}
+            >
+              <View style={styles.cityCardContent}>
+                <View style={styles.cityCardLeft}>
+                  <View style={styles.iconCircle}>
+                    <Ionicons name="location" size={18} color="#60D7E9" />
+                  </View>
                   <Text style={styles.cityName}>{city.name}</Text>
-                  <Text style={styles.cityCoords}>
-                    {city.lat.toFixed(2)}°, {city.lon.toFixed(2)}°
-                  </Text>
+                </View>
+                <View style={styles.cityCardRight}>
+                  <TouchableOpacity 
+                    onPress={(e) => {
+                      e.stopPropagation();
+                      handleRemoveCity(city.id);
+                    }}
+                    style={styles.deleteButton}
+                  >
+                    <Ionicons name="close" size={20} color="#6B7280" />
+                  </TouchableOpacity>
                 </View>
               </View>
-              <TouchableOpacity 
-                onPress={() => handleRemoveCity(city.id)}
-                style={styles.deleteButton}
-              >
-                <Ionicons name="close-circle" size={24} color="#FF6B6B" />
-              </TouchableOpacity>
-            </View>
+            </TouchableOpacity>
           ))}
         </View>
       </ScrollView>
@@ -268,28 +298,19 @@ const styles = StyleSheet.create({
   },
   topSection: {
     paddingHorizontal: 20,
-    paddingVertical: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(96, 215, 233, 0.1)',
-  },
-  titleSection: {
-    width: '100%',
-  },
-  titleHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    marginBottom: 8,
+    paddingTop: 8,
+    paddingBottom: 16,
   },
   title: {
-    fontSize: 22,
+    fontSize: 28,
     fontWeight: '700',
     color: '#F3F4F6',
-    letterSpacing: 0.3,
+    letterSpacing: 0.5,
+    marginBottom: 4,
   },
   subtitle: {
-    fontSize: 12,
-    color: '#9CA3AF',
+    fontSize: 14,
+    color: '#6B7280',
     fontWeight: '500',
   },
   floatingButton: {
@@ -306,42 +327,48 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   citiesSection: {
-    gap: 12,
-    paddingTop: 12,
+    gap: 10,
+    paddingTop: 8,
   },
   cityCard: {
+    backgroundColor: '#1A1E23',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#2A2F35',
+  },
+  cityCardContent: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: 'rgba(96, 215, 233, 0.08)',
-    borderRadius: 14,
     padding: 16,
-    borderWidth: 1,
-    borderColor: 'rgba(96, 215, 233, 0.15)',
   },
   cityCardLeft: {
     flexDirection: 'row',
     alignItems: 'center',
-    flex: 1,
     gap: 12,
-  },
-  cityDetails: {
     flex: 1,
+  },
+  iconCircle: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(96, 215, 233, 0.1)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   cityName: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: '#FFFFFF',
-    marginBottom: 4,
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#F3F4F6',
     letterSpacing: 0.2,
   },
-  cityCoords: {
-    fontSize: 11,
-    color: '#9CA3AF',
-    fontWeight: '500',
+  cityCardRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   deleteButton: {
     padding: 8,
+    marginRight: -8,
   },
   modalOverlay: {
     flex: 1,

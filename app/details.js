@@ -112,76 +112,65 @@ export default function DetailsScreen() {
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <StatusBar barStyle="light-content" backgroundColor="#0F1113" />
       
-      {/* Header Premium com Logo */}
+      {/* Header com botão de voltar e logo centralizada */}
       <View style={styles.header}>
         <TouchableOpacity 
           onPress={() => router.back()} 
           style={styles.backButton}
+          activeOpacity={0.7}
         >
           <Ionicons name="arrow-back" size={24} color="#60D7E9" />
         </TouchableOpacity>
         <View style={styles.headerContent}>
-          <Image source={require('./logo-apex.jpg')} style={styles.logo} />
+          <TouchableOpacity onPress={() => router.push('/(tabs)/home')} activeOpacity={0.7}>
+            <Image source={require('./logo-apex.jpg')} style={styles.logo} />
+          </TouchableOpacity>
         </View>
         <View style={{ width: 24 }} />
       </View>
 
       <View style={styles.contentPadding}>
         
-        {/* CARD PRINCIPAL - Temperatura Atual */}
-        <LinearGradient
-          colors={["#60D7E9", "#2A91D4"]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.mainCard}
-        >
-          <View style={styles.mainCardContent}>
-            <View style={styles.tempSection}>
-              <Ionicons 
-                name={getWeatherIcon(weatherDetails.current.weatherCode)} 
-                size={80} 
-                color="#fff" 
-              />
-              <View style={styles.tempInfo}>
-                <Text style={styles.temperature}>{weatherDetails.current.temperature}°</Text>
-                <Text style={styles.weatherDesc}>{getWeatherDescription(weatherDetails.current.weatherCode)}</Text>
-              </View>
-            </View>
-            
-            <View style={styles.tempRangeContainer}>
-              <View style={styles.tempRangeItem}>
-                <Ionicons name="arrow-up" size={18} color="#fff" />
-                <Text style={styles.tempRangeLabel}>Máx</Text>
-                <Text style={styles.tempRangeValue}>{weatherDetails.daily.maxTemp}°</Text>
-              </View>
-              <View style={styles.divider} />
-              <View style={styles.tempRangeItem}>
-                <Ionicons name="arrow-down" size={18} color="#fff" />
-                <Text style={styles.tempRangeLabel}>Mín</Text>
-                <Text style={styles.tempRangeValue}>{weatherDetails.daily.minTemp}°</Text>
-              </View>
-              <View style={styles.divider} />
-              <View style={styles.tempRangeItem}>
-                <Ionicons name="speedometer-outline" size={18} color="#fff" />
-                <Text style={styles.tempRangeLabel}>Vento</Text>
-                <Text style={styles.tempRangeValue}>{Math.round(weatherDetails.current.windSpeed)} km/h</Text>
-              </View>
-            </View>
+        {/* Informação da cidade */}
+        <View style={styles.cityHeader}>
+          <Text style={styles.cityName}>{params.cityName}</Text>
+          <View style={styles.weatherBadge}>
+            <Ionicons 
+              name={getWeatherIcon(weatherDetails.current.weatherCode)} 
+              size={16} 
+              color="#60D7E9" 
+            />
+            <Text style={styles.weatherBadgeText}>{getWeatherDescription(weatherDetails.current.weatherCode)}</Text>
           </View>
-        </LinearGradient>
-
-        {/* CARD PREVISÃO HORÁRIA */}
-        <View style={styles.sectionHeader}>
-          <Ionicons name="time-outline" size={20} color="#60D7E9" />
-          <Text style={styles.sectionTitle}>Previsão por Hora</Text>
         </View>
 
-        <LinearGradient
-          colors={["#60D7E9", "#2A91D4"]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.hourCard}
-        >
+        {/* CARD PRINCIPAL - Temperatura Atual */}
+        <View style={styles.mainCard}>
+          <Text style={styles.temperature}>{weatherDetails.current.temperature}°</Text>
+          <Text style={styles.tempLabel}>Temperatura atual</Text>
+          
+          <View style={styles.tempStats}>
+            <View style={styles.statItem}>
+              <Text style={styles.statValue}>{weatherDetails.daily.maxTemp}°</Text>
+              <Text style={styles.statLabel}>Máxima</Text>
+            </View>
+            <View style={styles.statDivider} />
+            <View style={styles.statItem}>
+              <Text style={styles.statValue}>{weatherDetails.daily.minTemp}°</Text>
+              <Text style={styles.statLabel}>Mínima</Text>
+            </View>
+            <View style={styles.statDivider} />
+            <View style={styles.statItem}>
+              <Text style={styles.statValue}>{Math.round(weatherDetails.current.windSpeed)}</Text>
+              <Text style={styles.statLabel}>Vento km/h</Text>
+            </View>
+          </View>
+        </View>
+
+        {/* PREVISÃO HORÁRIA */}
+        <Text style={styles.sectionTitle}>Próximas Horas</Text>
+
+        <View style={styles.hourCard}>
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
@@ -200,58 +189,6 @@ export default function DetailsScreen() {
               </View>
             ))}
           </ScrollView>
-        </LinearGradient>
-
-        {/* INFORMAÇÕES ADICIONAIS */}
-        <View style={styles.sectionHeader}>
-          <Ionicons name="information-circle-outline" size={20} color="#60D7E9" />
-          <Text style={styles.sectionTitle}>Informações Adicionais</Text>
-        </View>
-
-        <View style={styles.infoGrid}>
-          <LinearGradient
-            colors={["#1E2328", "#252B31"]}
-            style={styles.infoCard}
-          >
-            <View style={styles.infoIconContainer}>
-              <Ionicons name="water-outline" size={24} color="#60D7E9" />
-            </View>
-            <Text style={styles.infoLabel}>Sensação Térmica</Text>
-            <Text style={styles.infoValue}>{weatherDetails.current.temperature}°</Text>
-          </LinearGradient>
-
-          <LinearGradient
-            colors={["#1E2328", "#252B31"]}
-            style={styles.infoCard}
-          >
-            <View style={styles.infoIconContainer}>
-              <Ionicons name="eye-outline" size={24} color="#60D7E9" />
-            </View>
-            <Text style={styles.infoLabel}>Visibilidade</Text>
-            <Text style={styles.infoValue}>10 km</Text>
-          </LinearGradient>
-
-          <LinearGradient
-            colors={["#1E2328", "#252B31"]}
-            style={styles.infoCard}
-          >
-            <View style={styles.infoIconContainer}>
-              <Ionicons name="compass-outline" size={24} color="#60D7E9" />
-            </View>
-            <Text style={styles.infoLabel}>Pressão</Text>
-            <Text style={styles.infoValue}>1013 hPa</Text>
-          </LinearGradient>
-
-          <LinearGradient
-            colors={["#1E2328", "#252B31"]}
-            style={styles.infoCard}
-          >
-            <View style={styles.infoIconContainer}>
-              <Ionicons name="rainy-outline" size={24} color="#60D7E9" />
-            </View>
-            <Text style={styles.infoLabel}>Umidade</Text>
-            <Text style={styles.infoValue}>65%</Text>
-          </LinearGradient>
         </View>
 
       </View>
@@ -266,11 +203,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#0F1113",
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
     paddingTop: 85,
-    paddingBottom: 16,
+    paddingBottom: 24,
+    paddingHorizontal: 20,
     backgroundColor: '#0F1113',
   },
   backButton: {
@@ -304,156 +239,134 @@ const styles = StyleSheet.create({
     letterSpacing: 0.3,
   },
 
-  // Card Principal
-  mainCard: {
-    borderRadius: 20,
-    padding: 20,
+  // Header da Cidade
+  cityHeader: {
     marginBottom: 24,
   },
-  mainCardContent: {
-    gap: 20,
-  },
-  tempSection: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 16,
-  },
-  tempInfo: {
-    flex: 1,
-  },
-  temperature: {
-    fontSize: 64,
-    color: "#fff",
-    fontWeight: "700",
-    letterSpacing: -2,
-    lineHeight: 68,
-  },
-  weatherDesc: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: '600',
-    marginTop: 4,
+  cityName: {
+    fontSize: 32,
+    fontWeight: '700',
+    color: '#F3F4F6',
+    marginBottom: 8,
     letterSpacing: 0.3,
   },
-  tempRangeContainer: {
+  weatherBadge: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
-    backgroundColor: 'rgba(255, 255, 255, 0.15)',
-    borderRadius: 12,
-    paddingVertical: 12,
-    paddingHorizontal: 8,
+    alignItems: 'center',
+    gap: 6,
+    alignSelf: 'flex-start',
+    backgroundColor: 'rgba(96, 215, 233, 0.1)',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(96, 215, 233, 0.2)',
   },
-  tempRangeItem: {
+  weatherBadgeText: {
+    fontSize: 13,
+    color: '#60D7E9',
+    fontWeight: '600',
+  },
+
+  // Card Principal
+  mainCard: {
+    backgroundColor: '#1A1E23',
+    borderRadius: 16,
+    padding: 24,
+    marginBottom: 24,
+    borderWidth: 1,
+    borderColor: '#2A2F35',
+    alignItems: 'center',
+  },
+  temperature: {
+    fontSize: 72,
+    color: "#F3F4F6",
+    fontWeight: "700",
+    letterSpacing: -2,
+  },
+  tempLabel: {
+    fontSize: 14,
+    color: '#6B7280',
+    fontWeight: '500',
+    marginTop: 4,
+    marginBottom: 20,
+  },
+  tempStats: {
+    flexDirection: 'row',
+    width: '100%',
+    justifyContent: 'space-around',
+    paddingTop: 20,
+    borderTopWidth: 1,
+    borderTopColor: '#2A2F35',
+  },
+  statItem: {
     alignItems: 'center',
     gap: 4,
-    flex: 1,
   },
-  tempRangeLabel: {
-    color: 'rgba(255, 255, 255, 0.8)',
-    fontSize: 11,
-    fontWeight: '600',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-  tempRangeValue: {
-    color: '#fff',
-    fontSize: 16,
+  statValue: {
+    fontSize: 20,
+    color: '#F3F4F6',
     fontWeight: '700',
   },
-  divider: {
+  statLabel: {
+    fontSize: 11,
+    color: '#6B7280',
+    fontWeight: '500',
+  },
+  statDivider: {
     width: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    marginVertical: 4,
+    backgroundColor: '#2A2F35',
   },
 
   // Seção
-  sectionHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginBottom: 12,
-    marginTop: 8,
-  },
   sectionTitle: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '700',
     color: '#F3F4F6',
     letterSpacing: 0.3,
+    marginBottom: 16,
   },
 
   // Card Horário
   hourCard: {
+    backgroundColor: '#1A1E23',
     borderRadius: 16,
     padding: 16,
     marginBottom: 24,
+    borderWidth: 1,
+    borderColor: '#2A2F35',
   },
   hourlyScroll: {
     paddingVertical: 4,
-    gap: 12,
+    gap: 10,
   },
   hourItem: {
     alignItems: "center",
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
+    backgroundColor: 'rgba(96, 215, 233, 0.05)',
+    paddingVertical: 14,
+    paddingHorizontal: 12,
     borderRadius: 12,
-    minWidth: 70,
+    minWidth: 65,
     gap: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(96, 215, 233, 0.1)',
   },
   hourItemActive: {
-    backgroundColor: 'rgba(255, 255, 255, 0.25)',
+    backgroundColor: 'rgba(96, 215, 233, 0.15)',
+    borderColor: 'rgba(96, 215, 233, 0.3)',
   },
   hourLabel: {
-    color: "#fff",
-    fontSize: 12,
+    color: "#9CA3AF",
+    fontSize: 11,
     fontWeight: '600',
     letterSpacing: 0.3,
   },
   hourIcon: {
-    marginVertical: 4,
+    marginVertical: 2,
   },
   hourTemp: {
-    color: "#fff",
+    color: "#F3F4F6",
     fontSize: 16,
     fontWeight: "700",
-  },
-
-  // Grid de Informações
-  infoGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 12,
-    marginBottom: 20,
-  },
-  infoCard: {
-    flex: 1,
-    minWidth: '47%',
-    borderRadius: 16,
-    padding: 16,
-    alignItems: 'center',
-    gap: 8,
-    borderWidth: 1,
-    borderColor: 'rgba(96, 215, 233, 0.2)',
-  },
-  infoIconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: 'rgba(96, 215, 233, 0.15)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  infoLabel: {
-    color: '#9CA3AF',
-    fontSize: 12,
-    fontWeight: '600',
-    textAlign: 'center',
-    letterSpacing: 0.3,
-  },
-  infoValue: {
-    color: '#F3F4F6',
-    fontSize: 18,
-    fontWeight: '700',
-    letterSpacing: 0.3,
   },
 });

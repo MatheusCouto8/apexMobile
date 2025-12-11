@@ -1,0 +1,10 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Format changed files",
+			"type": "shell",
+			"command": "npx prettier --write \"app/(tabs)/home.js\" \"app/(tabs)/about.js\" \"app/(tabs)/settings.js\" \"app/details.js\""
+		}
+	]
+}
