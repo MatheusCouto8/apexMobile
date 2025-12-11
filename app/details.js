@@ -109,10 +109,10 @@ export default function DetailsScreen() {
   }
 
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+    <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#0F1113" />
       
-      {/* Header com botão de voltar e logo centralizada */}
+      {/* Header com botão de voltar e logo */}
       <View style={styles.header}>
         <TouchableOpacity 
           onPress={() => router.back()} 
@@ -121,13 +121,15 @@ export default function DetailsScreen() {
         >
           <Ionicons name="arrow-back" size={24} color="#60D7E9" />
         </TouchableOpacity>
-        <View style={styles.headerContent}>
+        <View style={styles.headerCenter}>
           <TouchableOpacity onPress={() => router.push('/(tabs)/home')} activeOpacity={0.7}>
             <Image source={require('./logo-apex.jpg')} style={styles.logo} />
           </TouchableOpacity>
         </View>
-        <View style={{ width: 24 }} />
+        <View style={styles.headerSpacer} />
       </View>
+
+      <ScrollView style={styles.scrollContent} showsVerticalScrollIndicator={false}>
 
       <View style={styles.contentPadding}>
         
@@ -194,6 +196,7 @@ export default function DetailsScreen() {
       </View>
 
     </ScrollView>
+    </View>
   );
 }
 
@@ -203,23 +206,32 @@ const styles = StyleSheet.create({
     backgroundColor: "#0F1113",
   },
   header: {
-    paddingTop: 85,
-    paddingBottom: 24,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingTop: 50,
+    paddingBottom: 16,
     paddingHorizontal: 20,
     backgroundColor: '#0F1113',
   },
   backButton: {
     padding: 8,
+    width: 40,
   },
-  headerContent: {
+  headerCenter: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  headerSpacer: {
+    width: 40,
   },
   logo: {
     width: 65,
     height: 65,
     borderRadius: 32.5,
+  },
+  scrollContent: {
+    flex: 1,
   },
   contentPadding: {
     paddingHorizontal: 16,

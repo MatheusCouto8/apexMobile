@@ -83,7 +83,7 @@ export default function TabLayout() {
         name="settings"
         options={{
           headerShown: false,
-          title: 'Mensagens',
+          title: 'Cidades',
           tabBarIcon: ({ color, size, focused }) => (
             <View style={{ 
               alignItems: 'center', 
@@ -101,16 +101,30 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="profile"
+        name="about"
         options={{
-          href: null,
+          headerShown: false,
+          title: 'Sobre',
+          tabBarIcon: ({ color, size, focused }) => (
+            <View style={{ 
+              alignItems: 'center', 
+              justifyContent: 'center',
+              paddingVertical: 4,
+              opacity: focused ? 1 : 0.7,
+            }}>
+              <Ionicons 
+                name={focused ? "information-circle" : "information-circle-outline"} 
+                size={24} 
+                color={color}
+              />
+            </View>
+          ),
         }}
       />
       <Tabs.Screen
-        name="about"
+        name="profile"
         options={{
           href: null,
-          headerShown: false,
         }}
       />
     </Tabs>

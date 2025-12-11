@@ -356,8 +356,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#0F1113',
   },
   header: {
-    paddingTop: 85,
-    paddingBottom: 24,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 100,
+    paddingTop: 50,
+    paddingBottom: 16,
     paddingHorizontal: 20,
     backgroundColor: '#0F1113',
   },
@@ -374,6 +379,7 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     paddingHorizontal: 20,
+    marginTop: 120,
   },
   greetingSection: {
     marginTop: 28,

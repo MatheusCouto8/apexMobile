@@ -8,6 +8,7 @@ import { useRouter } from 'expo-router';
 export default function SettingsScreen() {
   const router = useRouter();
   const [cities, setCities] = useState([]);
+  const [weatherData, setWeatherData] = useState({});
 
   // Carregar cidades do AsyncStorage
   useEffect(() => {
@@ -18,7 +19,9 @@ export default function SettingsScreen() {
     try {
       const savedCities = await AsyncStorage.getItem('cities');
       if (savedCities) {
-        setCities(JSON.parse(savedCities));
+        const parsedCities = JSON.parse(savedCities);
+        setCities(parsedCities);
+        fetchWeatherData(parsedCities);
       } else {
         // Cidades padrão
         const defaultCities = [
@@ -29,10 +32,43 @@ export default function SettingsScreen() {
         ];
         setCities(defaultCities);
         await AsyncStorage.setItem('cities', JSON.stringify(defaultCities));
+        fetchWeatherData(defaultCities);
       }
     } catch (error) {
       console.error('Erro ao carregar cidades:', error);
     }
+  };
+
+  const fetchWeatherData = async (citiesList) => {
+    try {
+      const weather = {};
+      await Promise.all(
+        citiesList.map(async (city) => {
+          const response = await fetch(
+            `https://api.open-meteo.com/v1/forecast?latitude=${city.lat}&longitude=${city.lon}&current_weather=true`
+          );
+          const data = await response.json();
+          weather[city.id] = {
+            temperature: Math.round(data.current_weather.temperature),
+            weatherCode: data.current_weather.weathercode
+          };
+        })
+      );
+      setWeatherData(weather);
+    } catch (error) {
+      console.error('Erro ao buscar clima:', error);
+    }
+  };
+
+  const getWeatherIcon = (weatherCode) => {
+    if (weatherCode === 0) return 'sunny';
+    if (weatherCode >= 1 && weatherCode <= 3) return 'partly-sunny';
+    if (weatherCode >= 45 && weatherCode <= 48) return 'cloudy';
+    if (weatherCode >= 51 && weatherCode <= 67) return 'rainy';
+    if (weatherCode >= 71 && weatherCode <= 77) return 'snow';
+    if (weatherCode >= 80 && weatherCode <= 82) return 'rainy';
+    if (weatherCode >= 95 && weatherCode <= 99) return 'thunderstorm';
+    return 'cloudy';
   };
 
   const [modalVisible, setModalVisible] = useState(false);
@@ -169,13 +205,18 @@ export default function SettingsScreen() {
               activeOpacity={0.7}
             >
               <View style={styles.cityCardContent}>
-                <View style={styles.cityCardLeft}>
-                  <View style={styles.iconCircle}>
-                    <Ionicons name="location" size={18} color="#60D7E9" />
-                  </View>
-                  <Text style={styles.cityName}>{city.name}</Text>
-                </View>
+                <Text style={styles.cityName}>{city.name}</Text>
                 <View style={styles.cityCardRight}>
+                  {weatherData[city.id] && (
+                    <Ionicons 
+                      name={getWeatherIcon(weatherData[city.id].weatherCode)} 
+                      size={20} 
+                      color="#60D7E9" 
+                    />
+                  )}
+                  <Text style={styles.cityTemp}>
+                    {weatherData[city.id] !== undefined ? `${weatherData[city.id].temperature}°` : '--°'}
+                  </Text>
                   <TouchableOpacity 
                     onPress={(e) => {
                       e.stopPropagation();
@@ -183,7 +224,7 @@ export default function SettingsScreen() {
                     }}
                     style={styles.deleteButton}
                   >
-                    <Ionicons name="close" size={20} color="#6B7280" />
+                    <Ionicons name="close" size={18} color="#6B7280" />
                   </TouchableOpacity>
                 </View>
               </View>
@@ -274,8 +315,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#0F1113',
   },
   header: {
-    paddingTop: 85,
-    paddingBottom: 24,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 100,
+    paddingTop: 50,
+    paddingBottom: 16,
     paddingHorizontal: 20,
     backgroundColor: '#0F1113',
   },
@@ -292,6 +338,7 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     paddingHorizontal: 20,
+    marginTop: 120,
   },
   scrollContent: {
     paddingBottom: 120,
@@ -340,35 +387,28 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 16,
-  },
-  cityCardLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    flex: 1,
-  },
-  iconCircle: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: 'rgba(96, 215, 233, 0.1)',
-    justifyContent: 'center',
-    alignItems: 'center',
+    paddingVertical: 16,
+    paddingHorizontal: 20,
   },
   cityName: {
     fontSize: 16,
     fontWeight: '600',
     color: '#F3F4F6',
     letterSpacing: 0.2,
+    flex: 1,
   },
   cityCardRight: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 12,
+  },
+  cityTemp: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#60D7E9',
   },
   deleteButton: {
-    padding: 8,
-    marginRight: -8,
+    padding: 4,
   },
   modalOverlay: {
     flex: 1,
